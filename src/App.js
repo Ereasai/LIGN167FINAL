@@ -1,9 +1,9 @@
 import OpenAI from 'openai';
 import React, { useState } from 'react';
 import './App.css';
-import Graph from './Graph';
-import ChatBox from './ChatBox';
-import ChatInput from './ChatInput';
+import Graph from './Graph/Graph';
+import ChatBox from './ChatBox/ChatBox';
+import ChatInput from './ChatInput/ChatInput';
 
 const testTopics = [
   {
@@ -34,49 +34,101 @@ const testTopics = [
 ];
 
 const openai = new OpenAI({
-  apiKey: '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', // Directly using the API key here (very bad in practice)
+  apiKey: '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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
+const SYSTEM_PROMPT = {role: "system", content: "You are a class tutor for natural language understanding. The course number is LIGN 167. You are part of a web application, hence uou are able to display a graph of topics and it's dependencies. At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user."}
+
+const FUNCTIONS = [
+  {
+    name: "updateGraph",
+    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: gradient descent, derivatives, linear algebra. You may not pick anything else. Do not envoke if it's not in that list.",
+    parameters: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          description: "The relevant topic to display to the user right now."
+        }
+      },
+      require: ["topic"]
+    }
+  }
+]
+
+let messages = [
+  SYSTEM_PROMPT
+]
+
+
+
 function App() {
   const [inputText, setInputText] = useState('');
-  const [messages, setMessages] = useState([]);
-  
+  const [displayMessages, setDisplayMessages] = useState([]);
   const [topics, setTopics] = useState(testTopics);
+
+  const sendMessageAsUser = async (msg) => {
+    // if msg is empty, then process the chat without any user input.
+    if (msg != "") { 
+      // UI updates
+      setDisplayMessages(displayMessages => [...displayMessages, {name: "user", text: msg }]); 
+      setInputText(''); // Clear input field after sending
+    
+      messages.push({role: "user", "content": msg}) 
+    }
   
+    try {
   
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: messages,
+        functions: FUNCTIONS,
+        max_tokens: 150,
+        temperature: 1
+      });
+      
+      const gptResponse = response.choices[0].message.content;
+      let wantsToUseFunction = response.choices[0].finish_reason == "function_call";
+      console.log("wants to use function:", wantsToUseFunction);
+  
+      if (wantsToUseFunction) {
+        // console.log(response.choices[0].message.function_call.arguments)
+        let functionName = response.choices[0].message.function_call.name
+        let args = JSON.parse(response.choices[0].message.function_call.arguments);
+
+        // SUCCESSFULLY PARSED FUNCTION CALL!!!
+        console.log(functionName, args)
+  
+        messages.push(response.choices[0].message) // record that GPT wanted to do a function call.
+        messages.push({
+          role: "function",
+          name: "updateGraph",
+          content: "success!"
+        })
+  
+        sendMessageAsUser("") 
+  
+      } else {
+        // UI update
+        setDisplayMessages(displayMessages => [...displayMessages, {name: 'assistant', text: gptResponse }]);
+      }  
+    } catch (error) {
+      console.error('Error calling OpenAI API:', error);
+      // Handle error appropriately
+    }
+  }
 
   const sendMessage = async () => {
     const trimmed = inputText.trim();
-    if (trimmed !== '') {
-
-      setMessages(messages => [...messages, { user: 'You', text: trimmed }])
-      // Clear input field after sending
-      setInputText('');
-
-
-      try {
-        // Adjust the API call as per the correct usage of the OpenAI library
-        const response = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [{role: "user", content: trimmed}],
-          max_tokens: 150,
-          temperature: 1
-        });
-        
-        const gptResponse = response.choices[0].message.content
-        setMessages(messages => [...messages, { user: 'GPT', text: gptResponse }]);
-      } catch (error) {
-        console.error('Error calling OpenAI API:', error);
-        // Handle error appropriately
-      }
-    }
+    // only process input when it's not empty.
+    if (trimmed !== '') sendMessageAsUser(trimmed)
   };
 
   return (
     <div className="App">
       <div className="chat-container">
-        <ChatBox messages={messages} />
+        <ChatBox messages={displayMessages} />
         <ChatInput
           inputText={inputText}
           setInputText={setInputText}

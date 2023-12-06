@@ -5,86 +5,12 @@
   color: #fff; /* Light text for dark mode */
 }
 
-
 .chat-container {
   flex: 1;
   border-right: 1px solid #333; /* Adjusted for dark mode */
   padding: 10px;
   display: flex;
   flex-direction: column;
-}
-
-.chat-box {
-  display: flex; 
-  flex: 1;
-  flex-direction: column;
-  gap: 30px;
-
-  overflow-y: auto;
-  margin-bottom: 10px;
-  background-color: #2a2a2a; /* Slightly lighter dark mode for contrast */
-  padding: 10px;
-  border-radius: 4px;
-
-  overflow-y: auto;
-  scroll-behavior: smooth; /* Smooth scrolling */
-}
-
-.input-container {
-  display: flex;
-  align-items: flex-start;
-}
-
-.chat-input {
-  background: #1a1a1a;
-  color: #fff;
-  border: 1px solid #ccc; /* Optional: Adds border for visibility */
-  font-family: inherit; /* Inherits font from body */
-  font-size: 16px; /* Set desired font size */
-  color: #fff; /* Text color, adjust as needed */
-
-
-  flex-grow: 1;
-  resize: none; /* Prevents manual resizing */
-  overflow-y: auto; /* Adds a scrollbar when text overflows */
-  height: auto; /* Allows height to adjust based on content */
-  min-height: 40px; /* Minimum initial height */
-  max-height: 120px; /* Maximum height before scrollbar appears */
-  margin-right: 10px;
-  padding: 5px; /* Adds some padding inside the textarea */
-  box-sizing: border-box; /* Ensures padding doesn't affect overall size */
-  white-space: pre-wrap; /* Ensures text wraps and whitespace is preserved */
-  word-break: break-word; /* Ensures long words wrap to the next line */ 
-
-  /* ANIMATIONS */
-  transition: 0.3s ease;
-}
-
-.chat-input:focus {
-  border-color: #4caf50; /* Highlight color when focused */
-  background: #2a2a2a;
-  outline: none; /* Removes default focus outline */
-}
-
-.send-button {
-  width: 10%;
-  height: 100%;
-  background-color: #4caf50; /* Green button */
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-
-  /* ANIMATIONS */
-  transition: all 0.3s ease; /* Smooth transition for hover effect */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
-}
-
-.send-button:hover {
-  background-color: #45a049; /* Slightly darker green on hover */
-  transform: translateY(-2px); /* Slight raise effect */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Larger shadow on hover */
 }
 
 .graph-container {

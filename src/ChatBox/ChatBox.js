@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import './ChatBox.css';
 
 const ChatBox = ({ messages }) => {
   const chatBoxRef = useRef(null);
@@ -13,7 +14,10 @@ const ChatBox = ({ messages }) => {
   return (
     <div className="chat-box" ref={chatBoxRef}>
       {messages.map((message, index) => (
-        <div key={index}>{`${message.user}: ${message.text}`}</div>
+        <div key={index} className="message">
+          {message.name === "user" ? "You: " : <b>Tutor: </b>}
+          {message.text}
+        </div>
       ))}
     </div>
   );

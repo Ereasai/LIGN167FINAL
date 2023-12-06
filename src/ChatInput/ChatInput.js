@@ -1,4 +1,5 @@
 import React from 'react';
+import './ChatInput.css';
 
 const ChatInput = ({ inputText, setInputText, sendMessage }) => {
   const handleInputChange = (event) => {

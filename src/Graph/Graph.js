@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import './Graph.css';
 
 const Graph = ({ topics }) => {
   const d3Container = useRef(null);
