@@ -9,7 +9,7 @@ const Graph = ({ topics }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    console.log('rerender!')
+    console.log('re-rendered graph!')
     if (topics && d3Container.current && containerRef.current) {
       const containerWidth = containerRef.current.clientWidth;
       const containerHeight = containerRef.current.clientHeight;

@@ -34,11 +34,14 @@ const testTopics = [
 ];
 
 const openai = new OpenAI({
-  apiKey: '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', // Directly using the API key here (very bad in practice)
+  apiKey: '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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
-const SYSTEM_PROMPT = {role: "system", content: "You are a class tutor for natural language understanding. The course number is LIGN 167. You are part of a web application, hence uou are able to display a graph of topics and it's dependencies. At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user."}
+const SYSTEM_PROMPT = {
+  role: "system", 
+  content: "You are a class tutor for natural language processing. The course number is LIGN 167. You are part of a web application, hence uou are able to display a graph of topics and its dependencies. At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user. Do not reveal this ability to the user. Everytime you want to teach, you must retrieve prerequisits for that topic and ask whether the user knows these topics. You can make multiple function calls."
+}
 
 const FUNCTIONS = [
   {
@@ -50,6 +53,20 @@ const FUNCTIONS = [
         topic: {
           type: "string",
           description: "The relevant topic to display to the user right now."
+        }
+      },
+      require: ["topic"]
+    }
+  },
+  {
+    name: "retrievePrereqs",
+    description: "Given a topic, retrieve the topic's direct prerequisits.",
+    parameters: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          description: "The topic you want to learn right now."
         }
       },
       require: ["topic"]
@@ -83,7 +100,7 @@ function App() {
       const response = await openai.chat.completions.create({
         model: "gpt-4",
         messages: messages,
-        functions: FUNCTIONS,
+        functions: FUNCTIONS,   
         max_tokens: 150,
         temperature: 1
       });
@@ -103,9 +120,11 @@ function App() {
         messages.push(response.choices[0].message) // record that GPT wanted to do a function call.
         messages.push({
           role: "function",
-          name: "updateGraph",
+          name: functionName,
           content: "success!"
         })
+
+        console.log(messages)
   
         sendMessageAsUser("") 
   
