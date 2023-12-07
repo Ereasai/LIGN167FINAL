@@ -87,12 +87,12 @@ const FUNCTIONS = [
     parameters: {
       type: "object",
       properties: {
-        goal: {
+        topic: {
           type: "string",
           description: "The learning goals for the current topic."
         }
       },
-      require: ["goal"]
+      require: ["topic"]
     }
   }
 ]
@@ -141,6 +141,12 @@ function App() {
   const CLIENT_FUNCTIONS = {
     updateGraph: (topic) => {
       setTopics([buildTopicGraph(topic)]);
+    },
+    add_lesson_plan: (topic) => {
+
+    },
+    retrieve_learning_goals: (topic) => {
+
     }
   }
 
