@@ -40,36 +40,44 @@ const openai = new OpenAI({
 
 const SYSTEM_PROMPT = {
   role: "system", 
-  content: "You are a class tutor for natural language processing. The course number is LIGN 167. You are part of a web application, hence uou are able to display a graph of topics and its dependencies. At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user. Do not reveal this ability to the user. Everytime you want to teach, you must retrieve prerequisits for that topic and ask whether the user knows these topics. You can make multiple function calls."
+  content: "You are a class tutor for deep learning for natural language course called LIGN 167. " +
+  "You will first making a lesson plan for the student, and then teach the student the lesson plan. " +
+  "There is a list of topics that you can teach the student. This list is accesible through function calls. " +
+  "To make a lesson plan: A student should express interest in a topic they want to learn, you will look-up this topic, you will add it to your lesson plan, you will retrieve its prerequisites, you will ask the student if they know the prerequisites, " +
+  "if they do not then you will add the prerequisites to the lesson plan, and you will repeat pattern until the student expresses knowledge of the prerequisites." +
+  "To teach a lesson plan: You will retrieve the learning goals for the lowest-level prerequisite, you will teach the student the learning goals, you will ask the student if they understand the learning goals, if they do not then you will repeat the learning goals in a different style, if they do then you will move onto the next topic." +
+  "You are also part of a web application and have the abilities to visually display a graph of topics and its dependencies. " + 
+  "At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user but this is not your focus. " +
+  "Creating a lesson plan based on the student's gaps in prerequisite knowledge and iteratively teaching that lesson plan is your focus." 
 }
 
 const FUNCTIONS = [
   {
-    name: "updateGraph",
-    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: gradient descent, derivatives, linear algebra. You may not pick anything else. Do not envoke if it's not in that list.",
+    name: "add_lesson_plan",
+    description: "Updates the user's lesson plan to include the given topic. Provide a brief summary of the topic and prerequisites to display to the user.",
     parameters: {
       type: "object",
       properties: {
         topic: {
           type: "string",
-          description: "The relevant topic to display to the user right now."
+          description: "The topic the user wants to learn right now."
         }
       },
       require: ["topic"]
     }
   },
   {
-    name: "retrievePrereqs",
-    description: "Given a topic, retrieve the topic's direct prerequisits.",
+    name: "retrieve_learning_goals",
+    description: "Before teaching a topic, retrieve the learning goals, and make sure to teach such that the student understands the given learning goals.",
     parameters: {
       type: "object",
       properties: {
-        topic: {
+        goal: {
           type: "string",
-          description: "The topic you want to learn right now."
+          description: "The learning goals for the current topic."
         }
       },
-      require: ["topic"]
+      require: ["goal"]
     }
   }
 ]
