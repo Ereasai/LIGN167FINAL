@@ -5,7 +5,7 @@ import Graph from './Graph/Graph';
 import ChatBox from './ChatBox/ChatBox';
 import ChatInput from './ChatInput/ChatInput';
 
-import TREE_DATA from './TREE_DATA.js';
+import {TREE_DATA} from './TREE_DATA.js';
 
 const testTopics = [
   {
@@ -36,28 +36,30 @@ const testTopics = [
 ];
 
 const openai = new OpenAI({
-  apiKey: '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', // Directly using the API key here (very bad in practice)
+  apiKey: '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',//'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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
 const SYSTEM_PROMPT = {
   role: "system", 
   content: "You are a class tutor for deep learning for natural language course called LIGN 167. " +
-  "You will first making a lesson plan for the student, and then teach the student the lesson plan. " +
-  "There is a list of topics that you can teach the student. This list is accesible through function calls. " +
-  "To make a lesson plan: A student should express interest in a topic they want to learn, you will look-up this topic, you will add it to your lesson plan, you will retrieve its prerequisites, you will ask the student if they know the prerequisites, " +
-  "if they do not then you will add the prerequisites to the lesson plan, and you will repeat pattern until the student expresses knowledge of the prerequisites." +
-  "To teach a lesson plan: You will retrieve the learning goals for the lowest-level prerequisite, you will teach the student the learning goals, you will ask the student if they understand the learning goals, if they do not then you will repeat the learning goals in a different style, if they do then you will move onto the next topic." +
-  "You are also part of a web application and have the abilities to visually display a graph of topics and its dependencies. " + 
-  "At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user but this is not your focus. " +
-  "Creating a lesson plan based on the student's gaps in prerequisite knowledge and iteratively teaching that lesson plan is your focus." 
+  "You will iteratively make a lesson plan for the student, starting with their root topic, and then teach the student the lesson plan. " +
+  "There is a list of topics that you can teach the student. This list is accesible through function calls. \n\n " +
+  "To make a lesson plan: A student should express interest in a topic they want to learn, this will be their root topic. You can set it with set_root_topic function. Then, you will look-up this topic, you will add it to your lesson plan, you will retrieve its prerequisites, and you will ask the student if they know the prerequisites. " +
+  "Then, if they do not, you will add the prerequisite to the lesson plan, and you will reorient around the prerequisite such that it is the new topic of interest. Then repeat this pattern until the student expresses knowledge of the prerequisites. Do not add prerequisites unless the student says to. Add them one-by-one." +
+  "After the lesson plan is completed, you will not look up any more prerequisites or add anymore topics." +
+  "To teach a lesson plan: You will retrieve the learning goals for the lowest-level prerequisite, you will teach the student the learning goals, you will ask the student if they understand the learning goals and if they have any questions, you will answer their questions and provide their requests, once they feel comfortable with the learning goals then you will move onto the next topic." +
+  "You are also part of a web application and have the abilities to visually display a graph of topics and its dependencies using the set_root_topic function " + 
+  "At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information. " +
+  "Reminder: your focus is creating a lesson plan based on the student's gaps in prerequisite knowledge and afterwards iteratively teaching that lesson plan through student feedback." + 
+  "Work with the student on a topic until they say they are comfortable moving to the next one. " 
 }
 
 const topicNames = Object.keys(TREE_DATA);
 const FUNCTIONS = [
   {
-    name: "updateGraph",
-    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: " + topicNames + ". You may not pick anything else. Do not envoke if it's not in that list.",
+    name: "set_root_topic",
+    description: "Sets the root topic, the first and most complicated topic the student mentions they want to learn. This updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: " + topicNames + ". You may not pick anything else. Try to use this early in the conversation.",
     parameters: {
       type: "object",
       properties: {
@@ -69,7 +71,7 @@ const FUNCTIONS = [
       require: ["topic"]
     },
     name: "add_lesson_plan",
-    description: "Updates the user's lesson plan to include the given topic. Provide a brief summary of the topic and prerequisites to display to the user.",
+    description: "Updates the user's lesson plan to include the given topic. The topics must be from these finite choices: " + topicNames + ". Provide a brief summary of the topic and prerequisites to display to the user. ",
     parameters: {
       type: "object",
       properties: {
@@ -83,7 +85,7 @@ const FUNCTIONS = [
   },
   {
     name: "retrieve_learning_goals",
-    description: "Before teaching a topic, retrieve the learning goals, and make sure to teach such that the student understands the given learning goals.",
+    description: "Before teaching a topic, retrieve the learning goals, and teach the student such that they will be familiar with the given learning goals. You can also ask if they have any others, and incorporate that into the lesson. Teach them one learning goal at a time, starting with the most basic topic.",
     parameters: {
       type: "object",
       properties: {
@@ -139,14 +141,16 @@ function App() {
   const [topics, setTopics] = useState([buildTopicGraph('log_reg')]) // useState(testTopics);
 
   const CLIENT_FUNCTIONS = {
-    updateGraph: (topic) => {
+    set_root_topic: (topic) => {
       setTopics([buildTopicGraph(topic)]);
     },
     add_lesson_plan: (topic) => {
-
+      setTopics([buildTopicGraph(topic)]);
+      return TREE_DATA[topic].prereqs
     },
     retrieve_learning_goals: (topic) => {
-
+      setTopics([buildTopicGraph(topic)]);
+      return TREE_DATA[topic].goals
     }
   }
 
@@ -166,7 +170,7 @@ function App() {
         model: "gpt-4",
         messages: messages,
         functions: FUNCTIONS,   
-        max_tokens: 150,
+        max_tokens: 500,
         temperature: 1
       });
       
@@ -181,14 +185,14 @@ function App() {
 
         // SUCCESSFULLY PARSED FUNCTION CALL!!!
         console.log(functionName, args)
-        CLIENT_FUNCTIONS[functionName](args.topic);
-
+        const result = CLIENT_FUNCTIONS[functionName](args.topic);
+        console.log(result)
 
         messages.push(response.choices[0].message) // record that GPT wanted to do a function call.
         messages.push({
           role: "function",
           name: functionName,
-          content: "success!"
+          content: "success! " + result
         })
 
         console.log(messages)

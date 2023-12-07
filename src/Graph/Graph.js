@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import './Graph.css';
 
+import {TREE_DATA, TOPIC_ID_NAME_MAP} from '../TREE_DATA.js';
+
 const Graph = ({ topics }) => {
   const d3Container = useRef(null);
   const containerRef = useRef(null);
@@ -90,10 +92,11 @@ const Graph = ({ topics }) => {
         .attr("stroke-width", 10)
         .attr("dy", 30)
         .style("text-anchor", "middle")
-        .text(d => d.data.name)
+        .text(d => TOPIC_ID_NAME_MAP[d.data.name])
         .style("fill", "white") // Make text white
         .attr("paint-order", "stroke")
         .attr("stroke", "#1a1a1a");
+      console.log(TOPIC_ID_NAME_MAP)
 
     }
   }, [topics]); // Dependency array
