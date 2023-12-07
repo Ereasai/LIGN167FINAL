@@ -36,7 +36,7 @@ const testTopics = [
 ];
 
 const openai = new OpenAI({
-  apiKey: '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', // Directly using the API key here (very bad in practice)
+  apiKey: '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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
@@ -53,10 +53,11 @@ const SYSTEM_PROMPT = {
   "Creating a lesson plan based on the student's gaps in prerequisite knowledge and iteratively teaching that lesson plan is your focus." 
 }
 
+const topicNames = Object.keys(TREE_DATA);
 const FUNCTIONS = [
   {
     name: "updateGraph",
-    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: gradient descent, derivatives, linear algebra. You may not pick anything else. Do not envoke if it's not in that list.",
+    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: " + topicNames + ". You may not pick anything else. Do not envoke if it's not in that list.",
     parameters: {
       type: "object",
       properties: {
@@ -139,7 +140,7 @@ function App() {
 
   const CLIENT_FUNCTIONS = {
     updateGraph: (topic) => {
-      setTopics(buildTopicGraph(topic));
+      setTopics([buildTopicGraph(topic)]);
     }
   }
 
@@ -173,7 +174,7 @@ function App() {
         let args = JSON.parse(response.choices[0].message.function_call.arguments);
 
         // SUCCESSFULLY PARSED FUNCTION CALL!!!
-        // console.log(functionName, args)
+        console.log(functionName, args)
         CLIENT_FUNCTIONS[functionName](args.topic);
 
 
