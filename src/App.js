@@ -36,7 +36,7 @@ const testTopics = [
 ];
 
 const openai = new OpenAI({
-  apiKey: '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', // Directly using the API key here (very bad in practice)
+  apiKey: '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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
