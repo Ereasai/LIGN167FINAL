@@ -36,19 +36,20 @@ const testTopics = [
 ];
 
 const openai = new OpenAI({
-  apiKey: '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', // Directly using the API key here (very bad in practice)
+  apiKey: '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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
 const SYSTEM_PROMPT = {
   role: "system", 
-  content: "You are a class tutor for natural language processing. The course number is LIGN 167. You are part of a web application, hence uou are able to display a graph of topics and its dependencies. At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user. Do not reveal this ability to the user. Everytime you want to teach, you must retrieve prerequisits for that topic and ask whether the user knows these topics. You can make multiple function calls."
+  content: "You are a class tutor for natural language processing. The course number is LIGN 167. You are part of a web application, hence uou are able to display a graph of topics and its dependencies. At any point in the conversation, if you feel that the relevant topic has changed, you must make a function call to change the graph to display the correct information to the user. Do not reveal this ability to the user. "
 }
 
+const topicNames = Object.keys(TREE_DATA);
 const FUNCTIONS = [
   {
     name: "updateGraph",
-    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: gradient descent, derivatives, linear algebra. You may not pick anything else. Do not envoke if it's not in that list.",
+    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: " + topicNames + ". You may not pick anything else. Do not envoke if it's not in that list.",
     parameters: {
       type: "object",
       properties: {
@@ -119,7 +120,7 @@ function App() {
 
   const CLIENT_FUNCTIONS = {
     updateGraph: (topic) => {
-      setTopics(buildTopicGraph(topic));
+      setTopics([buildTopicGraph(topic)]);
     }
   }
 
@@ -153,7 +154,7 @@ function App() {
         let args = JSON.parse(response.choices[0].message.function_call.arguments);
 
         // SUCCESSFULLY PARSED FUNCTION CALL!!!
-        // console.log(functionName, args)
+        console.log(functionName, args)
         CLIENT_FUNCTIONS[functionName](args.topic);
 
 
