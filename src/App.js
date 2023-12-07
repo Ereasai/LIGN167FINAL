@@ -5,6 +5,8 @@ import Graph from './Graph/Graph';
 import ChatBox from './ChatBox/ChatBox';
 import ChatInput from './ChatInput/ChatInput';
 
+import TREE_DATA from './TREE_DATA.js';
+
 const testTopics = [
   {
     name: 'SGD',
@@ -58,32 +60,67 @@ const FUNCTIONS = [
       require: ["topic"]
     }
   },
-  {
-    name: "retrievePrereqs",
-    description: "Given a topic, retrieve the topic's direct prerequisits.",
-    parameters: {
-      type: "object",
-      properties: {
-        topic: {
-          type: "string",
-          description: "The topic you want to learn right now."
-        }
-      },
-      require: ["topic"]
-    }
-  }
+  // {
+  //   name: "retrievePrereqs",
+  //   description: "Given a topic, retrieve the topic's direct prerequisits.",
+  //   parameters: {
+  //     type: "object",
+  //     properties: {
+  //       topic: {
+  //         type: "string",
+  //         description: "The topic you want to learn right now."
+  //       }
+  //     },
+  //     require: ["topic"]
+  //   }
+  // }
 ]
 
 let messages = [
   SYSTEM_PROMPT
 ]
 
+function buildTopicGraph(topicName, visited = new Set()) {
+  // Prevent circular dependencies
+  if (visited.has(topicName)) {
+    return null;
+  }
 
+  visited.add(topicName);
+
+  // Retrieve the topic data from TREE_DATA
+  const topicData = TREE_DATA[topicName];
+  if (!topicData) {
+    return null; // Topic not found
+  }
+
+  // Recursively build the graph for each prerequisite
+  const related = topicData.prereqs.map(prereq =>
+    buildTopicGraph(prereq, new Set(visited))
+  ).filter(t => t !== null); // Filter out any null values (circular dependencies)
+
+  return {
+    name: topicName,
+    related: related
+  };
+}
+
+function generateGraphForTopics(topics) {
+  return topics.map(topic => buildTopicGraph(topic));
+}
+
+// console.log(buildTopicGraph('log_reg'));
 
 function App() {
   const [inputText, setInputText] = useState('');
   const [displayMessages, setDisplayMessages] = useState([]);
   const [topics, setTopics] = useState(testTopics);
+
+  const CLIENT_FUNCTIONS = {
+    updateGraph: (topic) => {
+      setTopics(buildTopicGraph(topic));
+    }
+  }
 
   const sendMessageAsUser = async (msg) => {
     // if msg is empty, then process the chat without any user input.
@@ -115,8 +152,10 @@ function App() {
         let args = JSON.parse(response.choices[0].message.function_call.arguments);
 
         // SUCCESSFULLY PARSED FUNCTION CALL!!!
-        console.log(functionName, args)
-  
+        // console.log(functionName, args)
+        CLIENT_FUNCTIONS[functionName](args.topic);
+
+
         messages.push(response.choices[0].message) // record that GPT wanted to do a function call.
         messages.push({
           role: "function",
