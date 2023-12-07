@@ -117,12 +117,13 @@ function generateGraphForTopics(topics) {
   return topics.map(topic => buildTopicGraph(topic));
 }
 
-// console.log(buildTopicGraph('log_reg'));
+console.log(buildTopicGraph('log_reg'));
+console.log(testTopics)
 
 function App() {
   const [inputText, setInputText] = useState('');
   const [displayMessages, setDisplayMessages] = useState([]);
-  const [topics, setTopics] = useState(testTopics);
+  const [topics, setTopics] = useState([buildTopicGraph('log_reg')]) // useState(testTopics);
 
   const CLIENT_FUNCTIONS = {
     updateGraph: (topic) => {
