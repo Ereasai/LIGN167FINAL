@@ -55,6 +55,18 @@ const SYSTEM_PROMPT = {
 
 const FUNCTIONS = [
   {
+    name: "updateGraph",
+    description: "Updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: gradient descent, derivatives, linear algebra. You may not pick anything else. Do not envoke if it's not in that list.",
+    parameters: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          description: "The relevant topic to display to the user right now."
+        }
+      },
+      require: ["topic"]
+    },
     name: "add_lesson_plan",
     description: "Updates the user's lesson plan to include the given topic. Provide a brief summary of the topic and prerequisites to display to the user.",
     parameters: {
