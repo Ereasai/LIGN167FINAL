@@ -10,7 +10,7 @@
 ### To get all the Dependencies
 
 In the project directory: <p>
-run `npm install`
+Run `npm install`
 
 ### Start App
 
@@ -25,10 +25,16 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 If you want to learn more about a topic in LIGN 167, tell the tutor and it will assess the gaps in your knowledge for this topic. Then, it will work with you from the bottom-up to learn more about the topic and its prerequisite knowledge. <p>
 When you're learning about something, you can ask the tutor questions. The tutor will answer your questions until you're comfortable learning the next thing. <p>
 
+<p>
+<p>
+
+# References
+1. [Create React App](https://github.com/facebook/create-react-app)
+2. [OpenAI API](https://beta.openai.com/docs/introduction)
+3. [ChatGPT](https://chat.openai.com/auth/login)
 
 
-
-## External Web-App Resources 
+# External Web-App Resources 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
