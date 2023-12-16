@@ -4,45 +4,41 @@ import './App.css';
 import Graph from './Graph/Graph';
 import ChatBox from './ChatBox/ChatBox';
 import ChatInput from './ChatInput/ChatInput';
+//import { TREE_DATA } from './TREE_DATA';
+//import {TREE_DATA} from './TREE_DATA.js';
 
-import {TREE_DATA} from './TREE_DATA.js';
+let TREE_DATA = {
+  'vector': {
+    'summary':"A vector is is a fundamental mathematical structure that is characterized by both a direction (ordering) and a magnitude. For instance, wind has both a direction (North, South-West, etc) and a magnitude (10 km/hour) and could be represented as a vector (10 km/hour South-West). A point in Euclidean space is often represented as a vector of its coordinates and is the most common type of vector encountered. More generally, a vector is an element of a vector space -- a set that is closed under scalar multiplication and vector addition. [additional note: a vector is a very general entity that takes on many forms depending on its context, for instance, in certain vector spaces a vector could be a function such as f(x) = sin(x)]",
+    'goals':['Be able to compute various operations on vectors: addition, scalar multiplication, and linear combination',
+            'Be familiar with the geometric representation of vectors as points and arrows'],
+    'prereqs':[],
+    'learned':false
+},
+'dot_prod': {
+    'summary':"A vector is is a fundamental mathematical structure that is characterized by both a direction (ordering) and a magnitude. For instance, wind has both a direction (North, South-West, etc) and a magnitude (10 km/hour) and could be represented as a vector (10 km/hour South-West). A point in Euclidean space is often represented as a vector of its coordinates and is the most common type of vector encountered. More generally, a vector is an element of a vector space -- a set that is closed under scalar multiplication and vector addition. [additional note: a vector is a very general entity that takes on many forms depending on its context, for instance, in certain vector spaces a vector could be a function such as f(x) = sin(x)]",
+    'goals':['Define the dot product',
+            'Define the length of a vector in terms of the dot product',
+            'Know what unit vectors are and why they are useful',
+            'Be able to rescale a vector to unit length',
+            'Define orthogonality in terms of the dot product',
+            'Know the cosine formula for the dot product'],
+    'prereqs':['vector'],
+    'learned':false
+}};
 
-const testTopics = [
-  {
-    name: 'SGD',
-    related: [
-      {
-        name: 'Linear Algebra',
-        related: [
-          { name: 'Matrix Multiplication', related: [] },
-          { name: 'Determinants', related: [] },
-          { name: 'Transformations', related: [] },
-        ]
-      },
-      {
-        name: 'Multivariable Calculus',
-        related: [
-          {
-            name: 'Derivatives', related: [
-              { name: 'Single Variable', related: [] },
-              { name: 'Multiple Variable', related: [] }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  // ... more topics
-];
+
 
 const openai = new OpenAI({
-  apiKey: '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',//'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', // Directly using the API key here (very bad in practice)
+  apiKey: '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',//'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', // Directly using the API key here (very bad in practice)
   dangerouslyAllowBrowser: true,
 });
 
 const SYSTEM_PROMPT = {
   role: "system", 
   content: "You are a class tutor for deep learning for natural language course called LIGN 167. " +
+  "Using a syllabus pasted into the chat, your first task will be to build a dictionary of topics with pre-reqs such that it represents a directed-acyclic graph that is visually demonstrated to the student." +
+  "You will then use this graph to create a lesson plan for the student, and then teach the student the lesson plan. " +
   "You will iteratively make a lesson plan for the student, starting with their root topic, and then teach the student the lesson plan. " +
   "There is a list of topics that you can teach the student. This list is accesible through function calls. \n\n " +
   "To make a lesson plan: A student should express interest in a topic they want to learn, this will be their root topic. You can set it with set_root_topic function. Then, you will look-up this topic, you will add it to your lesson plan, you will retrieve its prerequisites, and you will ask the student if they know the prerequisites. " +
@@ -58,6 +54,23 @@ const SYSTEM_PROMPT = {
 const topicNames = Object.keys(TREE_DATA);
 const FUNCTIONS = [
   {
+    name: "build_tree_dictionary",
+    description: "THIS FUNCTION MUST BE CALLED BEFORE ANY OTHER FUNCTION. Using the input from the user, build a dictionary of topics with pre-reqs such that it represents a directed-acyclic graph that is visually demonstrated to the student. You can use this graph to create a lesson plan for the student. Also return the root of the tree. AKA the topic with the most dependencies." +
+    "Don't tell the user this dictionary. Just make the visual plot and remember it for later. Ask the user what they would like to learn. ",
+    parameters: {
+      type: "object",
+      properties: {
+        tree: {
+          type: "dictionary",
+          description: "A dictionary of topics with pre-reqs such that it represents a directed-acyclic graph that is visually demonstrated to the student. Must be in the form {'topic': {'prereqs': ['prereq1', 'prereq2', ...], 'goals': ['goal1', 'goal2', ...], 'summary': 'ADD TOPIC SUMMARY HERE'}, 'prereq1': {...}, ...}."
+        }, 
+        root: {
+          type: "string",
+          description: "The root of the tree. AKA the topic with the most dependencies."
+        }
+      },
+      require: ["tree", "root"]
+    },
     name: "set_root_topic",
     description: "Sets the root topic, the first and most complicated topic the student mentions they want to learn. This updates the graph visible to the user, with relevant topic you want to display. You only have finite choices: " + topicNames + ". You may not pick anything else. Try to use this early in the conversation.",
     parameters: {
@@ -133,14 +146,19 @@ function generateGraphForTopics(topics) {
 }
 
 console.log(buildTopicGraph('log_reg'));
-console.log(testTopics)
+//console.log(testTopics)
 
 function App() {
   const [inputText, setInputText] = useState('');
   const [displayMessages, setDisplayMessages] = useState([]);
-  const [topics, setTopics] = useState([buildTopicGraph('log_reg')]) // useState(testTopics);
+  const [topics, setTopics] = useState([buildTopicGraph('dot_prod')]) // useState(testTopics);
 
   const CLIENT_FUNCTIONS = {
+    build_tree_dictionary: (tree, root) => {
+      TREE_DATA = tree;
+      setTopics([buildTopicGraph(root)]);
+      return TREE_DATA
+    },
     set_root_topic: (topic) => {
       setTopics([buildTopicGraph(topic)]);
     },
