@@ -1,22 +1,36 @@
-# Getting Started with Create React App
+# LIGN 167 AI Tutor 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Setting up the directory 
+
+### Clone the repository
+```git clone https://github.com/Ereasai/LIGN167FINAL.git```
+
 
 ### To get all the Dependencies
 
-Run `npm install`
+In the project directory: <p>
+run `npm install`
 
-## Available Scripts
+### Start App
 
-In the project directory, you can run:
-
-### `npm start`
+Run `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+
+## How does this work? 
+
+If you want to learn more about a topic in LIGN 167, tell the tutor and it will assess the gaps in your knowledge for this topic. Then, it will work with you from the bottom-up to learn more about the topic and its prerequisite knowledge. <p>
+When you're learning about something, you can ask the tutor questions. The tutor will answer your questions until you're comfortable learning the next thing. <p>
+
+
+
+
+## External Web-App Resources 
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ### `npm test`
 
@@ -43,32 +57,3 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
